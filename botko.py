@@ -1407,7 +1407,6 @@ class FarmSelect(discord.ui.Select):
         await interaction.response.edit_message(
             embed=farm_embed(interaction.user.id),
             view=FarmView(interaction.user.id)
-            ephemeral=True
         )
 
 class FarmView(discord.ui.View):
