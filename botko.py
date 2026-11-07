@@ -1433,6 +1433,7 @@ async def farm(interaction: discord.Interaction):
     await interaction.response.send_message(
         embed=farm_embed(interaction.user.id),
         view=FarmView(interaction.user.id),
+        ephemeral=True
     )
     # Save this message so the background loop can update the countdown live.
     try:
