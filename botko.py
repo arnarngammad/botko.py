@@ -1433,7 +1433,6 @@ async def farm(interaction: discord.Interaction):
     await interaction.response.send_message(
         embed=farm_embed(interaction.user.id),
         view=FarmView(interaction.user.id),
-        ephemeral=True
     )
     # Save this message so the background loop can update the countdown live.
     try:
@@ -1534,51 +1533,7 @@ async def farmreset(
     await interaction.response.send_message(
         f"✅ Reset **{count}** timer(s).", ephemeral=True
     )
-    
-@bot.tree.command(name="farmtimer", description="Set the time left on one of your farms")
-@app_commands.describe(
-    world="The world name",
-    farm_type="Which farm is this for?",
-    days="Days left",
-    hours="Hours left",
-    minutes="Minutes left"
-)
-@app_commands.choices(farm_type=FARM_CHOICES)
-async def farmtimer(
-    interaction: discord.Interaction,
-    world: str,
-    farm_type: app_commands.Choice[str],
-    days: int = 0,
-    hours: int = 0,
-    minutes: int = 0
-):
-    world = normalize_world(world)
-    key = farm_type.value
-    info = FARM_TIMERS[key]
 
-    if "|" in world or len(world) > 80:
-        await interaction.response.send_message("❌ Invalid world name.", ephemeral=True)
-        return
-
-    total = (days * 86400) + (hours * 3600) + (minutes * 60)
-    if days < 0 or hours < 0 or minutes < 0 or total <= 0:
-        await interaction.response.send_message(
-            "❌ Enter a time greater than 0.", ephemeral=True
-        )
-        return
-
-    # If the bot restarted and lost the farm, add it back automatically.
-    if not farm_get(interaction.user.id, world, key):
-        farm_add(interaction.user.id, world, key)
-
-    farm_set_end(interaction.user.id, world, key, time.time() + total)
-
-    await interaction.response.send_message(
-        f"✅ **{world}** — {info['emoji']} **{info['label']}** set to "
-        f"`{format_long_time(total)}` left.",
-        ephemeral=True
-    )
-    
 @tasks.loop(seconds=1)
 async def farm_panel_update_loop():
     """Edit open farm panels so HH:MM:SS changes without pressing Refresh."""
